@@ -14,7 +14,6 @@ const user = {
 
 function emailReg(text) {
   const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
   return re.test(String(text).toLowerCase());
 }
 
@@ -28,6 +27,7 @@ function pwReg(text) {
   const $userEmailInput = document.querySelector(".user-email-input");
   const $userPasswordInput = document.querySelector(".user-password-input");
   const $loginForm = document.querySelector(".login-form");
+  $userEmailInput.focus();
 
   // input 요소 input 이벤트 핸들러
   function inputHandler(e) {
@@ -39,7 +39,7 @@ function pwReg(text) {
     e.preventDefault();
     login(
       e.target,
-      () => navigate("./welcome.html"),
+      () => navigate("welcome.html"),
       () => alert("아이디 또는 비밀번호가 올바르지 않습니다.")
     );
   }
@@ -74,7 +74,8 @@ function pwReg(text) {
     window.location.href = url;
   }
 
-  $userEmailInput.addEventListener("input", inputHandler);
-  $userPasswordInput.addEventListener("input", inputHandler);
+  [$userEmailInput, $userPasswordInput].forEach((node) => {
+    node.addEventListener("input", inputHandler);
+  });
   $loginForm.addEventListener("submit", submitHandler);
 })();
