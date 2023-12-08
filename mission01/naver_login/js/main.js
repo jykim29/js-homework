@@ -24,12 +24,16 @@ function pwReg(text) {
 
 (function () {
   "use strict";
-  // DOM element
+  // 페이지 주소
+  const WELCOME_PAGE_URL = "welcome.html";
+  // 로그인 실패 메세지
+  const LOGIN_FAIL_MSG = "아이디 또는 비밀번호가 올바르지 않습니다.";
+  // DOM Element
   const $userEmailInput = document.querySelector(".user-email-input");
   const $userPasswordInput = document.querySelector(".user-password-input");
   const $loginForm = document.querySelector(".login-form");
 
-  // 객체를 사용한 email과 password의 valid 상태 관리
+  // 객체로 email과 password의 valid 상태 관리
   const isValidObj = {
     userEmail: false,
     userPassword: false,
@@ -37,18 +41,18 @@ function pwReg(text) {
   // 페이지 첫 로드 시 email input 요소에 포커스
   $userEmailInput.focus();
 
-  // input 요소 input 이벤트 핸들러
+  // input 이벤트 핸들러
   function handleInput(e) {
     inputValidation(e.target);
   }
 
-  // form 요소 submit 이벤트 핸들러
+  // submit 이벤트 핸들러
   function handleSubmit(e) {
     e.preventDefault();
     login(
       e.target,
-      () => navigate("welcome.html"),
-      () => alert("아이디 또는 비밀번호가 올바르지 않습니다.")
+      (url) => navigate(url),
+      (msg) => alert(msg)
     );
   }
 
@@ -79,7 +83,7 @@ function pwReg(text) {
   function login(form, success, fail) {
     const { userEmail: inputEmail, userPassword: inputPassword } = form;
     const isCorrect = compare(inputEmail.value, inputPassword.value);
-    return isCorrect ? success() : fail();
+    return isCorrect ? success(WELCOME_PAGE_URL) : fail(LOGIN_FAIL_MSG);
   }
 
   // 페이지 이동
@@ -91,23 +95,4 @@ function pwReg(text) {
     node.addEventListener("input", handleInput);
   });
   $loginForm.addEventListener("submit", handleSubmit);
-
-  /* 클로저 연습 겸 만들어 본 bindEvent 함수
-  function bindEvent(nodes, type, handler) {
-    if (Array.isArray(nodes)) {
-      nodes.forEach((node) => node.addEventListener(type, handler));
-    } else {
-      nodes.addEventListener(type, handler);
-    }
-    return () => {
-      if (Array.isArray(nodes)) {
-        nodes.forEach((node) => node.removeEventListener(type, handler));
-      } else {
-        nodes.removeEventListener(type, handler);
-      }
-    };
-  }
-  const removeInputEvent = bindEvent([$userEmailInput, $userPasswordInput], "input", handleInput);
-  const removeSubmitEvent = bindEvent($loginForm, "submit", handleSubmit);
-  */
 })();
