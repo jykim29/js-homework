@@ -96,3 +96,21 @@ function pwReg(text) {
   });
   $loginForm.addEventListener("submit", handleSubmit);
 })();
+
+/*
+  이메일 입력값과 패스워드 입력값 그리고 user의 id와 pw값을 비교할 때,
+  입력한 값의 validation 상태도 조건에 추가시켜야한다.
+  즉 (emailValue === user.id && pwValue === user.pw) 조건만 추가할 것이 아니라,
+  emailPass, pwPass라는 validation 상태 변수도 같이 true인지 체크를 해줘야 한다.
+
+  예시) 
+  if(emailPass && pwPass) {
+    if(emailValue === user.id && pwValue === user.pw) {
+      // 로그인 실행
+    } else {
+      // 로그인 오류 출력
+    }
+  } else {
+    // 입력값 validation 실패!
+  }
+*/
