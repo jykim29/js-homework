@@ -9,12 +9,18 @@
 */
 
 (() => {
+  // 기본 URL
   const BASE_URL = "./assets/";
+  // 이벤트 처리 방식
+  const EVENT_MODE = "delegation"; // 'delegation' | 'loop'
 
-  getNode(".nav").addEventListener("click", handleClick);
+  // 이벤트 위임 방식
+  if (EVENT_MODE === "delegation") getNode(".nav").addEventListener("click", handleClick);
+  // 반복문 방식
+  else getNodes(".nav li").forEach((li) => li.addEventListener("click", handleClick));
 
   function handleClick({ target }) {
-    const li = target.closest("li");
+    let li = EVENT_MODE === "delegation" ? target.closest("li") : this;
     if (!li) return;
     const index = li.dataset.index;
     const currentData = data[index - 1];
