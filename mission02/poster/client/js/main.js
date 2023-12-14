@@ -26,7 +26,6 @@
 
   function setClassName(elem) {
     if (elem.classList.contains("is-active")) return null;
-
     getNodes(".nav li").forEach((li) => li.classList.remove("is-active"));
     elem.classList.add("is-active");
   }
