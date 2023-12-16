@@ -1,0 +1,44 @@
+/* swiper */
+.swiper-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  width: 420px;
+  display: flex;
+  flex-flow: column nowrap;
+  row-gap: 30px;
+}
+.swiper {
+  width: 100%;
+}
+.pagination {
+  width: 420px;
+  display: flex;
+  justify-content: center;
+  column-gap: 10px;
+}
+.bullet {
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s;
+}
+.bullet.is-active {
+  border: 2px solid #fff;
+}
+
+/* 음소거 버튼 */
+.volume-control-button {
+  display: inline-block;
+  background-color: dodgerblue;
+  padding: 10px 20px;
+  font-size: 1.1rem;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px gray;
+  color: #fff;
+  transition: all 0.5s;
+  text-align: right;
+}
+.volume-control-button:hover {
+  filter: brightness(0.9);
+}
