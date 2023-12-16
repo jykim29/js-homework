@@ -41,12 +41,11 @@
   }
 
   function setBgColor(data) {
-    getNode("body").style.background = `linear-gradient(to bottom, ${data.color[0]}, ${data.color[1] || "#000"})`;
+    document.body.style.background = `linear-gradient(to bottom, ${data.color[0]}, ${data.color[1] || "#000"})`;
   }
 
   function setImage(elem, data) {
     elem.src = `${BASE_URL}/${data.name.toLowerCase()}.jpeg`;
-
     elem.alt = data.alt;
   }
 
