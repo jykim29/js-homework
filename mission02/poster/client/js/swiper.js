@@ -40,18 +40,17 @@
     audio.src = `${BASE_URL}/audio/${data.name.toLowerCase()}.m4a`;
     if (data.name === "WADE" || data.name === "GALE") audio.volume = 0.2; // ear protect
     else audio.volume = 1;
-    audio.play();
+    if (!audio.muted) audio.play();
   }
   getNode(".volume-control-button").addEventListener("click", (e) => {
     if (audio.muted) {
       e.currentTarget.textContent = "음소거";
-      e.currentTarget.style.backgroundColor = "tomato";
+      e.currentTarget.style.backgroundColor = "red";
       audio.muted = false;
     } else {
       e.currentTarget.textContent = "음소거 해제";
       e.currentTarget.style.backgroundColor = "dodgerblue";
       audio.muted = true;
     }
-    console.log(audio.muted);
   });
 })();
