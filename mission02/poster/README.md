@@ -14,7 +14,7 @@
 ### 1️⃣ 구현할 로직 목록
 
 1. 선택한 요소의 상태 클래스 변경
-2. 이벤트가 발생하면 주어진 data 배열을 참조하여 동적으로 속성 변경
+2. 이벤트가 발생하면 주어진 data.js 파일을 참조하여 동적으로 속성 변경
    1. `body` 요소의 `background`
    2. `visual img`요소의 `src` 와 `alt`
    3. `h1` 의 `textContent`
@@ -26,9 +26,9 @@
 3. `setClassName` 함수를 호출하여 현재 클릭한 요소에 `is-active` 클래스를 추가
    이어서 다른 요소를 클릭하였을 경우 모든 요소의 `is-active` 클래스를 제거 후 3번 과정 재실행
 4. 2번에서 할당한 `currentData` 변수를 인수로 사용하여 차례대로 아래의 함수를 호출
-   1. `setBgColor(data)` : `body`요소의 `background` 속성을 인수 `data`의 `color` 프로퍼티 값으로 변경
-   2. `setImage(elem, data)` : 첫 번째 인수 `elem` 요소의 `src`와 `alt` 속성을 두 번째 인수 `data`의 `name`과 `alt` 프로퍼티 값으로 변경
-   3. `setNameText(elem, data)` : 첫 번째 인수 `elem` 요소의 `textContent`를 두 번째 인수 `data`의 `name` 프로퍼티 값으로 변경
+   1. `setBgColor(node, data)` : `node` 의 `background` 속성을 인수 `data`의 `color` 프로퍼티 값으로 변경
+   2. `setImage(node, data)` : 첫 번째 인수 `node` 요소의 `src`와 `alt` 속성을 두 번째 인수 `data`의 `name`과 `alt` 프로퍼티 값으로 변경
+   3. `setNameText(node, data)` : 첫 번째 인수 `node` 요소의 `textContent`를 두 번째 인수 `data`의 `name` 프로퍼티 값으로 변경
    4. `playSound(data)` : 첫 번째 인수 `data`의 `name` 프로퍼티 값을 사용하여 전역에서 선언한 audio 객체의 `src`값을 변경하고 재생
 
 ### 3️⃣ 코드 설명
@@ -37,9 +37,9 @@
 
 ```js
 // 기본 URL
-const BASE_URL = "./assets";
+const BASE_ASSETS_PATH = "/mission02/poster/client/assets";
 // 오디오 객체
-const audio = new Audio();
+let audio = new AudioPlayer("");
 ```
 
 #### ◈ 이벤트 리스너 부착과 클릭 이벤트 핸들러 함수
@@ -73,7 +73,7 @@ function handleClick({ target }) {
   const index = li.dataset.index;
   const currentData = data[index - 1];
   if (setClassName(li) === null) return;
-  setBgColor(currentData);
+  setBgColor(getNode("body"), currentData);
   setImage(getNode(".visual img"), currentData);
   setNameText(getNode(".nickName"), currentData);
   playSound(currentData);
@@ -90,35 +90,35 @@ const currentData = data[index - 1];
 #### ◈ `setClassName` 함수
 
 ```js
-function setClassName(elem) {
-  if (elem.classList.contains("is-active")) return null;
+function setClassName(node) {
+  if (node.classList.contains("is-active")) return null;
   getNodes(".nav li").forEach((li) => li.classList.remove("is-active"));
-  elem.classList.add("is-active");
+  node.classList.add("is-active");
 }
 ```
 
 #### ◈ `setBgColor` 함수
 
 ```js
-function setBgColor(data) {
-  document.body.style.background = `linear-gradient(to bottom, ${data.color[0]}, ${data.color[1] || "#000"})`;
+function setBgColor(node, data) {
+  node.style.background = `linear-gradient(to bottom, ${data.color[0]}, ${data.color[1] || "#000"})`;
 }
 ```
 
 #### ◈ `setImage` 함수
 
 ```js
-function setImage(elem, data) {
-  elem.src = `${BASE_URL}/${data.name.toLowerCase()}.jpeg`;
-  elem.alt = data.alt;
+function setImage(node, data) {
+  node.src = `${BASE_URL}/${data.name.toLowerCase()}.jpeg`;
+  node.alt = data.alt;
 }
 ```
 
 #### ◈ `setNameText` 함수
 
 ```js
-function setNameText(elem, data) {
-  elem.textContent = data.name;
+function setNameText(node, data) {
+  node.textContent = data.name;
 }
 ```
 
@@ -126,7 +126,10 @@ function setNameText(elem, data) {
 
 ```js
 function playSound(data) {
-  audio.src = `${BASE_URL}/audio/${data.name.toLowerCase()}.m4a`;
+  const audioSource = `${BASE_ASSETS_PATH}/audio/${data.name.toLowerCase()}.m4a`;
+  const newAudio = new AudioPlayer(audioSource);
+  audio.stop();
+  audio = newAudio;
   if (data.name === "WADE" || data.name === "GALE") audio.volume = 0.2; // ear protect
   else audio.volume = 1;
   audio.play();
@@ -140,7 +143,6 @@ function playSound(data) {
 ```html
 <div class="swiper-container">
   <div class="swiper">
-    <button class="volume-control-button">음소거 해제</button>
     <div class="swiper-wrapper">
       <div class="swiper-slide">
         <div>
@@ -168,6 +170,7 @@ function playSound(data) {
       </div>
     </div>
   </div>
+  <button class="autoplay-button">▶ AutoPlay</button>
   <div class="pagination"></div>
 </div>
 ```
@@ -200,19 +203,24 @@ function playSound(data) {
 .bullet.is-active {
   border: 2px solid #fff;
 }
-.volume-control-button {
-  display: inline-block;
+/* 자동재생 버튼 */
+.autoplay-button {
+  position: absolute;
+  bottom: 147px;
+  right: 0;
   background-color: dodgerblue;
-  padding: 10px 20px;
-  font-size: 1.1rem;
-  border-radius: 5px;
-  box-shadow: 0px 0px 10px gray;
   color: #fff;
-  transition: all 0.5s;
-  text-align: right;
+  padding: 5px 10px;
+  border-radius: 30px;
+  z-index: 10;
+  transition: all 0.2s;
 }
-.volume-control-button:hover {
-  filter: brightness(0.9);
+.autoplay-button:hover {
+  background-color: #fff;
+  color: #000;
+}
+.autoplay-button.playing {
+  background-color: red;
 }
 ```
 
@@ -221,6 +229,7 @@ function playSound(data) {
 ```js
 const swiper = new Swiper(".swiper", {
   autoplay: {
+    enabled: false,
     delay: 3000,
   },
   pagination: {
@@ -230,7 +239,7 @@ const swiper = new Swiper(".swiper", {
     bulletClass: "bullet",
     bulletActiveClass: "is-active",
     renderBullet(index, className) {
-      return /*html*/ `<span class="${className}"><img src="${BASE_URL}/${data[index].name.toLowerCase()}.jpeg" /></span>`;
+      return /*html*/ `<span class="${className}"><img src="${BASE_ASSETS_PATH}/${data[index].name.toLowerCase()}.jpeg" /></span>`;
     },
   },
   keyboard: {
@@ -242,7 +251,7 @@ const swiper = new Swiper(".swiper", {
 });
 ```
 
-#### ◈ `reaIndexChange` 이벤트 핸들러 함수
+#### ◈ 인덱스 변경을 감지하는 `realIndexChange` 이벤트 핸들러 함수
 
 ```js
 swiper.on("realIndexChange", (swiper) => {
@@ -252,26 +261,26 @@ swiper.on("realIndexChange", (swiper) => {
 });
 ```
 
-#### ◈ 웹 브라우저 자동재생 정책으로 인한 음소거/해제 이벤트 추가 및 `playSound` 함수 로직 변경
+#### ◈ 슬라이드 자동재생 on/off 하는 `toggleAutoPlay` 함수
 
 ```js
-getNode(".volume-control-button").addEventListener("click", (e) => {
-  if (audio.muted) {
-    e.currentTarget.textContent = "음소거";
-    e.currentTarget.style.backgroundColor = "red";
-    audio.muted = false;
-  } else {
-    e.currentTarget.textContent = "음소거 해제";
-    e.currentTarget.style.backgroundColor = "dodgerblue";
-    audio.muted = true;
-  }
-});
-function playSound(data) {
-  audio.src = `${BASE_URL}/audio/${data.name.toLowerCase()}.m4a`;
-  if (data.name === "WADE" || data.name === "GALE") audio.volume = 0.2; // ear protect
-  else audio.volume = 1;
-  if (!audio.muted) audio.play(); // mute 상태가 아닌 경우에만 재생
+function toggleAutoPlay() {
+  let isAuto = false;
+  return (e) => {
+    if (!isAuto) {
+      e.currentTarget.textContent = "■ Stop";
+      swiper.autoplay.enabled = true;
+      swiper.autoplay.start();
+    } else {
+      e.currentTarget.textContent = "▶ AutoPlay";
+      swiper.autoplay.enabled = false;
+      swiper.autoplay.stop();
+    }
+    e.currentTarget.classList.toggle("playing");
+    isAuto = !isAuto;
+  };
 }
+getNode(".autoplay-button").addEventListener("click", toggleAutoPlay());
 ```
 
 ## 📚 회고
