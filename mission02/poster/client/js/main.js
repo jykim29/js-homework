@@ -10,12 +10,12 @@
 */
 
 (() => {
-  // 기본 URL
-  const BASE_URL = "./assets";
+  // 기본 assets 폴더 경로
+  const BASE_ASSETS_PATH = "/mission02/poster/client/assets";
   // 이벤트 처리 방식
   const EVENT_MODE = "delegation"; // 'delegation' | 'loop'
-  // 오디오 객체
-  const audio = new Audio();
+  // 오디오 객체 생성
+  let audio = new AudioPlayer("");
 
   // 이벤트 위임 방식
   if (EVENT_MODE === "delegation") getNode(".nav").addEventListener("click", handleClick);
@@ -28,33 +28,36 @@
     const index = li.dataset.index;
     const currentData = data[index - 1];
     if (setClassName(li) === null) return;
-    setBgColor(currentData);
+    setBgColor(getNode("body"), currentData);
     setImage(getNode(".visual img"), currentData);
     setNameText(getNode(".nickName"), currentData);
     playSound(currentData);
   }
 
-  function setClassName(elem) {
-    if (elem.classList.contains("is-active")) return null;
+  function setClassName(node) {
+    if (node.classList.contains("is-active")) return null;
     getNodes(".nav li").forEach((li) => li.classList.remove("is-active"));
-    elem.classList.add("is-active");
+    node.classList.add("is-active");
   }
 
-  function setBgColor(data) {
-    document.body.style.background = `linear-gradient(to bottom, ${data.color[0]}, ${data.color[1] || "#000"})`;
+  function setBgColor(node, data) {
+    node.style.background = `linear-gradient(to bottom, ${data.color[0]}, ${data.color[1] || "#000"})`;
   }
 
-  function setImage(elem, data) {
-    elem.src = `${BASE_URL}/${data.name.toLowerCase()}.jpeg`;
-    elem.alt = data.alt;
+  function setImage(node, data) {
+    node.src = `${BASE_ASSETS_PATH}/${data.name.toLowerCase()}.jpeg`;
+    node.alt = data.alt;
   }
 
-  function setNameText(elem, data) {
-    elem.textContent = data.name;
+  function setNameText(node, data) {
+    node.textContent = data.name;
   }
 
   function playSound(data) {
-    audio.src = `${BASE_URL}/audio/${data.name.toLowerCase()}.m4a`;
+    const audioSource = `${BASE_ASSETS_PATH}/audio/${data.name.toLowerCase()}.m4a`;
+    const newAudio = new AudioPlayer(audioSource);
+    audio.stop();
+    audio = newAudio;
     if (data.name === "WADE" || data.name === "GALE") audio.volume = 0.2; // ear protect
     else audio.volume = 1;
     audio.play();
